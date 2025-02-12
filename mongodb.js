@@ -98,3 +98,93 @@ db.customers.bulkWrite([
     {insertOne: {document: { _id: 'tata', name: 'tata alfian'}}},
     {insertOne: {document: { _id: 'dede', name: 'dede tanos'}}}
 ])
+
+
+// indexes
+db.products.createIndex({ category: 1 })
+
+
+// security - authentication
+// create user
+db.createUser(
+    {
+        user: 'apip',
+        pwd: 'apip123',
+        roles: ['userAdminAnyDatabase', 'readWriteAnyDatabase']
+    }
+)
+
+db.getUsers()
+
+// connect to database with user
+// 1. running ulang mongodb server :
+// ./bin/mongod --auth --dbpath=data
+
+// 2. running ulang mongo shell :
+// ./bin/mongosh "mongodb://apip:apip123@localhost:27017/latihan_cms?authSource=admin"
+
+// 3. add uri connection di mongo compas : 
+// mongodb://apip:apip123@localhost:27017/latihan_cms?authSource=admin
+
+
+// security - authorization
+// create user
+db.createUser(
+    {
+        user: 'tata',
+        pwd: 'tata123',
+        roles: [{
+            role: 'read',
+            db: 'latihan_cms'
+        }]
+    }
+)
+db.createUser(
+    {
+        user: 'dadan',
+        pwd: 'dadan123',
+        roles: [{
+            role: 'readWrite',
+            db: 'latihan_cms'
+        }]
+    }
+)
+
+// create roles
+db.createRole(
+    {
+        role: 'session_management',
+        roles: [
+            { role: 'read', db: 'latihan_cms' }
+        ],
+        privileges: [
+            { 
+                resource: 
+                { 
+                    db: 'latihan_cms', 
+                    collection: 'sessions' 
+                }, 
+                actions: ['insert'] 
+            }
+        ]
+    }
+)
+
+db.getRoles()
+db.getRoles({showPrivileges: true})
+
+
+// backup database
+// redirect to path : /Users/apipkurniawan/downloads/software/mongodb-database-tools-macos-arm64-100.11.0
+// backup using mongodump : 
+// ./bin/mongodump --uri="mongodb://apip:apip123@localhost:27017/latihan_cms?authSource=admin" --out=/Users/apipkurniawan/Downloads/mongoDB/mongodb-backup
+// backup using mongoexport : 
+// ./bin/mongoexport --uri="mongodb://apip:apip123@localhost:27017/latihan_cms?authSource=admin" --out=/Users/apipkurniawan/Downloads/mongoDB/customers.json --collection=customers
+
+
+// restore database
+// redirect to path : /Users/apipkurniawan/downloads/software/mongodb-database-tools-macos-arm64-100.11.0
+// restore hasil mongodump : 
+// ./bin/mongorestore --uri="mongodb://apip:apip123@localhost:27017/latihan_cms_restore?authSource=admin" --dir=/Users/apipkurniawan/Downloads/mongoDB/mongodb-backup/latahan_cms
+// restore hasil mongoexport :
+// ./bin/mongoimport --uri="mongodb://apip:apip123@localhost:27017/latihan_cms_import?authSource=admin" --file=/Users/apipkurniawan/Downloads/mongoDB/customers.json --collection=customers
