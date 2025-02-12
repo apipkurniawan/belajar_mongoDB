@@ -91,3 +91,10 @@ db.products.updateOne({ _id: '3' }, { $unset: { price: '' } })
 
 // delete data
 db.products.deleteOne({ _id: '3' })
+
+
+// bulk write => instruksi untuk melakukan beberapa operasi sekaligus
+db.customers.bulkWrite([
+    {insertOne: {document: { _id: 'tata', name: 'tata alfian'}}},
+    {insertOne: {document: { _id: 'dede', name: 'dede tanos'}}}
+])
